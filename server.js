@@ -9,8 +9,6 @@ const port = 8000;
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
-//require('./app/routes')(app, {});
-
 MongoClient.connect(db.url, (err, database) => {
 	if (err) return console.log(err)
 	
@@ -22,7 +20,3 @@ MongoClient.connect(db.url, (err, database) => {
 		console.log('We are live on ' + port);
 	});               
 })
-
-//app.listen(port, () => {
-//  console.log('We are live on ' + port);
-//});
