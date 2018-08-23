@@ -1,5 +1,5 @@
 // routes/phoneinfo_routes.js
-
+var moment = require('moment');
 var ObjectID = require('mongodb').ObjectID;
 
 module.exports = function(app, db) {
@@ -7,12 +7,13 @@ module.exports = function(app, db) {
 	
 	// insert a row	
 	app.post('/phoneinfo', (req, res) => {
+		console.log("phoneinfo sent: "+ req.body.host_number + " + "+ req.body.message);
 		const phone = { 
 			host_number: req.body.host_number, 
 			remote_number: req.body.remote_number, 
 			message: req.body.message, 
-			created_on_timestamp: new Date(), 
-			created_on_date: new Date().toDateString(),
+			created_on_timestamp: moment.utc().format(), 
+			created_on_date: moment.utc().format("MM-DD-YYYY"),
 			first_name: '', 
 			last_name: '', 
 			email_address: '', 
@@ -123,7 +124,7 @@ module.exports = function(app, db) {
 				domain_name: req.body.domain_name,
 				password: req.body.password,
 				challenge_code: req.body.challenge_code,
-				updated_on_timestamp: new Date()
+				updated_on_timestamp: moment.utc().format()
 		};
 	    db.collection('phoneinfo').update(rowId, { $set: phone}, (err, result) => {
 	      if (err) {
