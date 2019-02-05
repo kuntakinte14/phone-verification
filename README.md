@@ -24,4 +24,5 @@ API Endpoints
 - deletes a row based on provided database row id
 
 /phoneinfo/:id (HTTP PUT)
--updates a row based on the provided database row id
+- updates a row based on the provided database row id
+
