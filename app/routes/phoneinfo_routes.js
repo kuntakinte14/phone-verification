@@ -6,8 +6,8 @@ var ObjectID = require('mongodb').ObjectID;
 module.exports = function(app, db) {
 	const collection = 
 
-	// this is just for testing, the post handler is what is being used moving 
-	// forward
+	// this is just for testing, the post handler is what is being used for real
+	// message handling
 	app.get('/sms-gateway', (req, res) => {
 		console.log("sms gateway http get callback:");
 		//console.log(req);
@@ -98,6 +98,7 @@ module.exports = function(app, db) {
 			message: req.body.message, 
 			created_on_timestamp: moment.utc().format(), 
 			created_on_date: moment.utc().format("MM-DD-YYYY"),
+			// add a boolean field called code_used
 			first_name: '', 
 			last_name: '', 
 			email_address: '', 
@@ -175,7 +176,41 @@ module.exports = function(app, db) {
 	        res.send(item);
 	      }
 	    });	    
-	});		
+	});	
+	
+	// select a row based on provided host number and domain
+	app.get('/phoneinfo/host_number/:host_number/domain/:domain', (req, res) => {
+	    const host_number = req.params.host_number;
+	    //console.log(host_number);
+	    const domain = req.params.domain;
+	    var short_code;
+	    if (domain == "google") {
+	    	short_code = "22000";
+	    }
+	    else if (domain == "yahoo") {
+	    	short_code = "36742";
+	    }
+	    else if (domain == "aol") {
+	    	short_code = "36742";
+	    }
+	    else if (domain == "o365") {
+	    	short_code = "732873";
+	    }
+	    //const short_code = req.params.short_code;
+	    //console.log(creation_date);
+	    //console.log()
+	    // I will need to modify this to use an in clause for the remote_number
+	    // and update the code_used boolean and set the updated_on_timestamp using
+	    // findOneAndUpdate
+	    const details = { 'host_number': host_number, 'remote_number': short_code };
+	    db.collection('phoneinfo').findOne(details, (err, item) => {
+	      if (err) {
+	        res.send({'error':'An error has occurred'});
+	      } else {
+	        res.send(item);
+	      }
+	    });	    
+	});	
 	
 	// delete an existing row
 	app.delete('/phoneinfo/:id', (req, res) => {
