@@ -88,6 +88,26 @@ module.exports = function(app, db) {
 		
 		//res.send("http post callback received and processed!");
 	});	
+	
+	// This processes the sms forwarding message sent from the ejoin sms gateway
+	// when an incoming message is received by that server
+	app.post('/ejoin', (req, res) => {
+		console.log("ejoin sms gateway sms message forwarded:");
+		//console.log(req.body);
+		var responseString="this is the body of the forwarded message: ";
+		req.on("data", function (data) {
+	        responseString += data;
+	        // save all the data from response
+	    });
+	    req.on("end", function () {
+	        console.log(responseString); 
+	        // print to console when response ends
+	        //var messageJSON = JSON.parse(responseString);
+		    //console.log(messageArray);
+	    });
+		
+		res.send("sms forwarded message received!");
+	});		
 		
 	// insert a row, with host_number, remote_number, and message values passed in the http post call
 	app.post('/phoneinfo', (req, res) => {
@@ -178,7 +198,9 @@ module.exports = function(app, db) {
 	    });	    
 	});	
 	
-	// select a row based on provided host number and domain
+	// Select a row based on provided host number and domain:
+	// This endpoint is designed to be used by account creation scripts that
+	// need to complete phone verification using an sms message code
 	app.get('/phoneinfo/host_number/:host_number/domain/:domain', (req, res) => {
 	    const host_number = req.params.host_number;
 	    //console.log(host_number);
