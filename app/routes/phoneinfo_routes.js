@@ -94,16 +94,96 @@ module.exports = function(app, db) {
 	app.post('/ejoin', (req, res) => {
 		console.log("ejoin sms gateway sms message forwarded:");
 		//console.log(req.body);
-		var responseString="this is the body of the forwarded message: ";
+		var responseString="";
 		req.on("data", function (data) {
+	        // save all the data from response			
 	        responseString += data;
-	        // save all the data from response
 	    });
 	    req.on("end", function () {
-	        console.log(responseString); 
+	        //console.log(responseString); 
 	        // print to console when response ends
 	        //var messageJSON = JSON.parse(responseString);
+	        var messageArray = responseString.split("\n");
+	        var messageValues = [];
 		    //console.log(messageArray);
+		    for (i = 0; i < messageArray.length; i++) { 
+		    	if (messageArray[i].includes("Sender")) {
+		    		//console.log(messageArray[i]);
+		    		curValueArray = messageArray[i].split(": ");
+		    		//console.log(curValueArray[0]+" - "+ curValueArray[1]);
+		    		messageValues["sender"] = curValueArray[1];
+		    		//senderArray = curValueArray;
+		    		//console.log(messageValues);
+		    	}
+		    	else if (messageArray[i].includes("SMSC")) {
+		    		//console.log(messageArray[i]);
+		    		curValueArray = messageArray[i].split(": ");
+		    		//console.log(curValueArray[0]+" - "+ curValueArray[1]);
+		    		messageValues["smsc"] = curValueArray[1];
+		    		//senderArray = curValueArray;
+		    		//console.log(messageValues);		    		
+		    	}
+		    	else if (messageArray[i].includes("SCTS")) {
+		    		//console.log(messageArray[i]);
+		    		curValueArray = messageArray[i].split(": ");
+		    		//console.log(curValueArray[0]+" - "+ curValueArray[1]);
+		    		messageValues["scts"] = curValueArray[1];
+		    		//senderArray = curValueArray;
+		    		//console.log(messageValues);			    		
+		    	}
+		    	else if (messageArray[i] !== null && messageArray[i] !== '') {
+		    		//console.log(messageArray[i]);
+		    		//curValueArray = messageArray[i].split(": ");
+		    		//console.log(curValueArray[0]+" - "+ curValueArray[1]);
+		    		messageParams = messageArray[i].split(" ");
+		    		//console.log(messageParams);
+		    		var code;
+		    		for (i=0; i<=messageParams.length; i++) { 
+		    			//console.log(parseInt(messageParams[i])); 
+		    			//curValue = parseInt(messageParams[i]);
+		    			if (isNaN(messageParams[i])) {
+		    				//console.log("this is text, move on");
+		    			}
+		    			else {
+		    				if (messageParams[i] != "365") {
+		    				    code = messageParams[i];
+		    				    //console.log("code is: "+code);
+		    				}
+		    			}
+		    		}		    		
+		    		messageValues["code"] = code;
+		    		//senderArray = curValueArray;
+		    		//console.log(messageValues);			    		
+		    	}
+		    }
+		    console.log(messageValues);
+		    // put the rest of the code here
+			const phone = { 
+					host_number: messageValues["smsc"], 
+					remote_number: messageValues["sender"], 
+					message: messageValues["code"], 
+					message_timestamp: messageValues["scts"],
+					created_on_timestamp: moment.utc().format(), 
+					created_on_date: moment.utc().format("MM-DD-YYYY"),
+					code_used: false,
+					first_name: '', 
+					last_name: '', 
+					email_address: '', 
+					phone_number: '',
+					company_name: '',
+					user_id: '',
+					domain_name: '',
+					password: '',
+					challenge_code: '',
+					updated_on_timestamp: ''			
+			};
+			db.collection('phoneinfo').insert(phone, (err, result) => {
+				if (err) { 
+			        res.send({ 'error': 'An error has occurred' }); 
+				} else {
+			        res.send(result.ops[0]);
+				}
+			});		    
 	    });
 		
 		res.send("sms forwarded message received!");
@@ -201,7 +281,8 @@ module.exports = function(app, db) {
 	// Select a row based on provided host number and domain:
 	// This endpoint is designed to be used by account creation scripts that
 	// need to complete phone verification using an sms message code
-	app.get('/phoneinfo/host_number/:host_number/domain/:domain', (req, res) => {
+	// http://149.28.244.189:8000/phoneinfo/username/{username}/token/{token}/pid/{pid}/mobile/{mobile}
+	app.get('/phoneinfo/username/:username/token/:token/pid/:pid/mobile/:mobile', (req, res) => {
 	    const host_number = req.params.host_number;
 	    //console.log(host_number);
 	    const domain = req.params.domain;
@@ -224,14 +305,15 @@ module.exports = function(app, db) {
 	    // I will need to modify this to use an in clause for the remote_number
 	    // and update the code_used boolean and set the updated_on_timestamp using
 	    // findOneAndUpdate
-	    const details = { 'host_number': host_number, 'remote_number': short_code };
-	    db.collection('phoneinfo').findOne(details, (err, item) => {
+	    //const details = { 'host_number': host_number, 'remote_number': short_code };
+	    /*db.collection('phoneinfo').findOne(details, (err, item) => {
 	      if (err) {
 	        res.send({'error':'An error has occurred'});
 	      } else {
 	        res.send(item);
 	      }
-	    });	    
+	    });*/ 
+	    res.send({"phone verification code":"564738"});
 	});	
 	
 	// delete an existing row
