@@ -112,6 +112,7 @@ module.exports = function(app, db) {
 	    req.on("end", function () {
 	        //var messageJSON = JSON.parse(responseString);
 	        var messageArray = responseString.split("\r\n");
+	    	//var messageArray = responseString.split("\n");
 	        var messageValues = [];
 		    for (i = 0; i < messageArray.length; i++) { 
 		    	if (messageArray[i].includes("Sender")) {
@@ -150,18 +151,21 @@ module.exports = function(app, db) {
 		    	}
 		    	else if (messageArray[i] !== null && messageArray[i] !== '') {
 		    		messageParams = messageArray[i].split(" ");
-		    		//console.log(messageArray[i]);
+		    		//console.log(messageParams);
 		    		var code;
 		    		var fullMessage = messageArray[i];
-		    		for (j=0; j<=messageParams.length; j++) { 
-		    			//console.log(parseInt(messageParams[i])); 
-		    			//curValue = parseInt(messageParams[i]);
+		    		for (j=0; j<messageParams.length; j++) { 
+		    			//console.log(messageParams[j]);
 		    			if (isNaN(messageParams[j])) {
-		    				//console.log("this is text, move on");
+		    				//console.log("this is text, check for gmail");
+		    				if (messageParams[j].indexOf("G-") == 0) {
+		    					//console.log("this is gmail verification");
+		    					code = messageParams[j].slice(2);
+		    				}
 		    			}
 		    			else {
 		    				if (messageParams[j] != "365") {
-		    				    code = messageParams[i];
+		    				    code = messageParams[j];
 		    				    //console.log("code is: "+code);
 		    				}
 		    			}
