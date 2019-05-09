@@ -292,7 +292,7 @@ module.exports = function(app, db) {
 		    	  }
 		    	  else {
                       console.log("the findOne did not return a row for the following values: mobile number - "+mobile+", pid - "+pid);
-                      var obj = {"error": "No verification code available. You probably need to use the phone number for verification prior to calling this API!"};                                                     $
+                      var obj = {"error": "No verification code available. You probably need to use the phone number for verification prior to calling this API!"};
 		    	  }		    	  
 		    	  res.send(JSON.stringify(obj));
 		      }
