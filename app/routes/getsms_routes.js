@@ -5,21 +5,29 @@ var ObjectID = require('mongodb').ObjectID;
 
 module.exports = function(app, db) {
 	const collection =
+
+	app.get('/usdo.php', (req,res) => {
+		console.log("/usdo.php requested using a get");
+	});
 		
-	app.get('/usdo.php', (req, res) => {	
-		//console.log(req);
-		var str = req.url.split('?')[1];
-		var urlParams = qs.parse(str);
+	app.post('/usdo.php', (req, res) => {	
+		console.log("/usdo.php requested using a post");
+		//console.log(req.body);
+		//var str = req.url.split('?')[1];
+		//var urlParams = qs.parse(str);
 		//console.log(urlParams.username);		
-	    const token = urlParams.token;
-	    const username = urlParams.username;
+	    //const token = urlParams.token;
+	    //const username = urlParams.username;
+	    const token = req.body.token;
+	    const username = req.body.username;	    
 	    // Security Check
 	    if (username == "pvacreator" && token == "6pGja1ntkO4IHrwsBrzd") {
-	    	const action = urlParams.action;
+	    	//const action = urlParams.action;
+	    	const action = req.body.action;
 	    	var response;
 	    	if (action == "getmobile") {
 	    		console.log("in getmobile action processing");
-	    		const pid = urlParams.pid;
+	    		//const pid = urlParams.pid;
 	    		
 	            var phoneArray = ["2062351348",
 	                              "2062355779",
@@ -30,12 +38,15 @@ module.exports = function(app, db) {
 		    	//var randomItem = phoneArray[Math.floor(Math.random()*phoneArray.length)];
 		    	var randomItem = "6285027003";
 		    	response = randomItem;
+		    	console.log("mobile number requested, returned the following: "+randomItem);
 		    	res.send(response);
 	    	}
 	    	else if (action == "getsms") {
 	    		console.log("in getsms action processing");
-	    		const pid = urlParams.pid;
-	    		const mobile = urlParams.mobile;
+	    		//const pid = urlParams.pid;
+	    		//const mobile = urlParams.mobile;
+	    		const pid = req.body.pid;
+	    		const mobile = req.body.mobile;	    		
 	    		
 			    var short_code;
 			    if (pid == "1") {
