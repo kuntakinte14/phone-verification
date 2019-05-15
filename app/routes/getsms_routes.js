@@ -36,7 +36,7 @@ module.exports = function(app, db) {
 	                              "2062359088",
 	                              "2062398140"];
 		    	//var randomItem = phoneArray[Math.floor(Math.random()*phoneArray.length)];
-		    	var randomItem = "6285027003";
+	            var randomItem = "2062359088" //"6285027003";
 		    	response = randomItem;
 		    	console.log("mobile number requested, returned the following: "+randomItem);
 		    	res.send(response);
@@ -46,8 +46,9 @@ module.exports = function(app, db) {
 	    		//const pid = urlParams.pid;
 	    		//const mobile = urlParams.mobile;
 	    		const pid = req.body.pid;
-	    		const mobile = req.body.mobile;	    		
+	    		const mobile = req.body.mobile.slice(1);	    		
 	    		
+	    		/*
 			    var short_code;
 			    if (pid == "1") {
 			    	// gmail
@@ -65,6 +66,7 @@ module.exports = function(app, db) {
 			    	// o365
 			    	short_code = "732873";
 			    }
+			    */
 
 			    //const filter = { 'receiver': mobile, 'sender': short_code, 'code_used': false };
 			    const filter = { 'receiver': mobile, 'pid': pid, 'code_used': false };
@@ -78,7 +80,7 @@ module.exports = function(app, db) {
 				      } else {
 		                  console.log(result);
 		                  for (var i in result) {
-		                        console.log(result[i].verification_code);
+		                        //console.log(result[i].verification_code);
 		                        var item = result[i];
 		                  }
 		                  //var item = JSON.parse(result[0]);
@@ -88,7 +90,9 @@ module.exports = function(app, db) {
 				    		  console.log("returned code: "+item.verification_code);
 				    		  //console.log(item);
 				    		  //var obj = {"phone verification code": item.verification_code};
-				    		  response = pid+"|"+item.message;
+				    		  response = "1|"+item.message;
+				    		  console.log(response);
+				    		  res.contentType('text/html');
 				    		  res.send(response);
 				    		  /*db.collection('phoneinfo').update(filter,update, (err, item) => {
 				    		      if (err) {
