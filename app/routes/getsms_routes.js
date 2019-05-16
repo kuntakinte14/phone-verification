@@ -12,7 +12,7 @@ module.exports = function(app, db) {
 		
 	app.post('/usdo.php', (req, res) => {	
 		console.log("/usdo.php requested using a post");
-		//console.log(req.body);
+		console.log(req.body);
 		//var str = req.url.split('?')[1];
 		//var urlParams = qs.parse(str);
 		//console.log(urlParams.username);		
@@ -25,7 +25,17 @@ module.exports = function(app, db) {
 	    	//const action = urlParams.action;
 	    	const action = req.body.action;
 	    	var response;
-	    	if (action == "getmobile") {
+	    	if (action == "addblack") {
+	    		console.log("in addblack action processing");
+	    		const pid = req.body.pid;
+	    		const mobile = req.body.mobile.slice(1);
+	    		console.log("this is the number being blacklisted: "+mobile);
+	    		response = "Message|Had add black list";
+	    		console.log(response);
+	    		res.contentType('text/html');
+	    		res.send(response);	    		
+	    	}
+	    	else if (action == "getmobile") {
 	    		console.log("in getmobile action processing");
 	    		//const pid = urlParams.pid;
 	    		
