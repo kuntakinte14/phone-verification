@@ -5,7 +5,7 @@ var ObjectID = require('mongodb').ObjectID;
 
 module.exports = function(app, db) {
 	const collection =
-
+		
 	app.get('/usdo.php', (req,res) => {
 		console.log("/usdo.php requested using a get");
 	});
