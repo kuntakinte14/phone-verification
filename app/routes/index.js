@@ -15,7 +15,7 @@ module.exports = function(app, db) {
   
   app.get('/dashboard', (req,res) => {
 	  //res.send('this is the getsms page');
-      db.collection('phoneinfo').find().toArray( function(err, results) {
+      db.collection('phoneinfo').find({ 'pid':'0'}).sort({_id:-1}).toArray( function(err, results) {
           if (err) {
             res.send({'error':'An error has occurred'});
           } else {

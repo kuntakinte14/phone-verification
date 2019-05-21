@@ -1,15 +1,42 @@
-this is the dashboard screen
-<br>
-<div>
-{{data}}
-</div>
-<br>
+<style>
+table, th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+  padding: 5px;
+}
+</style>
 <table>
+    <thead>
+        <tr>
+            <td>DATE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+            <!--<td>ID (timestamp)</td>-->
+            <!--<td>SMSC</td>-->
+            <td>SENDER</td>
+            <td>RECEIVER</td>
+            <td>MESSAGE</td>
+            <!--<td>PORT</td>-->
+            <!--<td>VERIFICATION CODE</td>-->
+            <td>PID</td>
+            <!--<td>MESSAGE TIMESTAMP</td>-->
+            <!--<td>CREATED ON TIMESTAMP</td>-->
+            <!--<td>UPDATED ON TIMESTAMP</td>-->
+        </tr>
+    </thead>
     <tbody>
         {{#each data}}
             <tr>
-                <td>{{_id}}</td>
-                <!--<td>{{this.lname}}</td>-->
+                <td>{{created_on_date}}</td>
+                <!--<td>{{_id}}</td>-->
+                <!--<td>{{smsc}}</td>-->   
+                <td>{{sender}}</td>   
+                <td>{{receiver}}</td>   
+                <td>{{message}}</td>   
+                <!--<td>{{port}}</td>-->   
+                <!--<td>{{verification_code}}</td>-->   
+                <td>{{pid}}</td>   
+                <!--<td>{{message_timestamp}}</td>-->   
+                <!--<td>{{created_on_timestamp}}</td>-->
+                <!--<td>{{updated_on_timestamp}}</td>-->
             </tr>
         {{/each}}
     </tbody>
