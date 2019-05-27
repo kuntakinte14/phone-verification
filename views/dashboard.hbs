@@ -9,6 +9,7 @@ table, th, td {
     <thead>
         <tr>
             <td>DATE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+            <td>TIME</td>
             <!--<td>ID (timestamp)</td>-->
             <!--<td>SMSC</td>-->
             <td>SENDER</td>
@@ -26,6 +27,13 @@ table, th, td {
         {{#each data}}
             <tr>
                 <td>{{created_on_date}}</td>
+                <td>
+			<script type="text/javascript">
+			var date = new Date('{{created_on_timestamp}}');
+			//alert(date.toTimeString());
+			document.write(date.toLocaleTimeString());
+			</script>
+		</td>
                 <!--<td>{{_id}}</td>-->
                 <!--<td>{{smsc}}</td>-->   
                 <td>{{sender}}</td>   
