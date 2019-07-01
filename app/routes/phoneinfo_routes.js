@@ -3,8 +3,17 @@ var moment = require('moment');
 var qs = require('querystring');
 var ObjectID = require('mongodb').ObjectID;
 
+const getDomain = require('./utils/findDomain');
+
 module.exports = function(app, db) {
 	const collection = 
+		
+	app.get('/test', (req, res) => {
+		var testString = "testing moving findDomain logic into a module";
+		var returnedValue = getDomain(testString);
+		res.send(returnedValue);
+		console.log(returnedValue);
+	});
 
     ////////////////////////////////////////////////////////////////////////////
 	//
@@ -21,10 +30,33 @@ module.exports = function(app, db) {
 	    });
 	    req.on("end", function () {
 	        //var messageJSON = JSON.parse(responseString);
+	    	////////////////////////////////////////////////////////////////////
+	    	//
+	    	// use this variable definition for live production as the ejoin
+	    	// gateway returns a carriage return line feed between each line of
+	    	// the forwarded message.
+	    	//
+	    	////////////////////////////////////////////////////////////////////
 	        var messageArray = responseString.split("\r\n");
+	        ////////////////////////////////////////////////////////////////////
+	        //
+	        // this line is used for testing using postman which cannot be
+	        // configured to return a carriage return + line feed, only a line
+	        // feed between each line of the forwarded message.
+	        //
+	        // If you uncomment the below line, make sure to comment out the
+	        // above line, and vice versa.
+	        //
+	        ////////////////////////////////////////////////////////////////////
 	    	//var messageArray = responseString.split("\n");
+	        
 	        var messageValues = [];
 		    for (i = 0; i < messageArray.length; i++) { 
+		    	////////////////////////////////////////////////////////////////
+		    	//
+		    	// Assign "sender" value
+		    	//
+		    	////////////////////////////////////////////////////////////////
 		    	if (messageArray[i].includes("Sender")) {
 		    		curValueArray = messageArray[i].split(": ");
 		    		if (curValueArray[1].startsWith("00")) {
@@ -36,6 +68,11 @@ module.exports = function(app, db) {
 		    		//console.log("final sender value: "+ curValueArray[1]);
 		    		messageValues["sender"] = curValueArray[1];
 		    	}
+		    	////////////////////////////////////////////////////////////////
+		    	//
+		    	// Assign "port" and "receiver" values
+		    	//
+		    	////////////////////////////////////////////////////////////////
                 else if (messageArray[i].includes("Receiver")) {
                     //console.log(messageArray[i]);
                     curValueArray = messageArray[i].split(": ");
@@ -46,7 +83,12 @@ module.exports = function(app, db) {
                     messageValues["receiver"] = curPropsArray[1];
                     //senderArray = curValueArray;
                     //console.log(messageValues);                           
-                }		    	
+                }
+		    	////////////////////////////////////////////////////////////////
+		    	//
+		    	// Assign "smsc" value
+		    	//
+		    	////////////////////////////////////////////////////////////////
 		    	else if (messageArray[i].includes("SMSC")) {
 		    		curValueArray = messageArray[i].split(": ");
 		    		if (curValueArray[1].startsWith("00")) {
@@ -58,19 +100,32 @@ module.exports = function(app, db) {
 		    		//console.log("final smsc value: "+ curValueArray[1]);		    		
 		    		messageValues["smsc"] = curValueArray[1];
 		    	}
+		    	////////////////////////////////////////////////////////////////
+		    	//
+		    	// Assign "scts" value
+		    	//
+		    	////////////////////////////////////////////////////////////////
 		    	else if (messageArray[i].includes("SCTS")) {
 		    		curValueArray = messageArray[i].split(": ");
 		    		messageValues["scts"] = curValueArray[1];
 		    	}
+		    	////////////////////////////////////////////////////////////////
+		    	//
+		    	// Assign "code", "message", and "pid" values
+		    	//
+		    	////////////////////////////////////////////////////////////////
 		    	else if (messageArray[i] !== null && messageArray[i] !== '') {
 		    		messageParams = messageArray[i].split(" ");
 		    		//console.log(messageParams);
 		    		var code;
 		    		var fullMessage = messageArray[i];
-		    		var pid = "0";
+		    		//var pid = "0"; // change this to call a method that returns the pid
+		    		var pid = getDomain(fullMessage);
 		    		
-		    		// Try and Assign pid
-		    		//console.log("is this aol? "+fullMessage.indexOf("AOL"));
+		    		////////////////////////////////////////////////////////////
+		    		// Try and Assign pid - move this code into a module to centralize
+		    		// all the logic for procesing the long list of domains we need to
+		    		// support
 		    		if (fullMessage.indexOf("AOL") != -1) {
 		    			//console.log("is this aol? YES");
 		    			pid = "3";
@@ -83,9 +138,15 @@ module.exports = function(app, db) {
 		    		}
 		    		else if (fullMessage.indexOf("Office") != -1) {                                                                                                                                                      
                         pid = "4";
-		    		}		    		
+		    		}	
+		    		////////////////////////////////////////////////////////////
 		    		
-		    		// Extract code
+		    		////////////////////////////////////////////////////////////
+		    		// Extract code - move this to a module to clean up this code.
+		    		// this is only really needed if we use our pva endpoints with
+		    		// pvacreator rather than the getsms endpoints. Also, all the
+		    		// services will most likely be returning / forwarding the
+		    		// full message
 		    		for (j=0; j<messageParams.length; j++) { 
 		    			//console.log(messageParams[j]);
 		    			if (isNaN(messageParams[j])) {
@@ -102,7 +163,9 @@ module.exports = function(app, db) {
 		    				    //console.log("code is: "+code);
 		    				}
 		    			}
-		    		}		    		
+		    		}		
+		    		////////////////////////////////////////////////////////////
+		    		
 		    		//console.log("full message: "+ messageArray[i]);
 		    		messageValues["code"] = code;
 		    		messageValues["message"] = fullMessage;
@@ -110,8 +173,10 @@ module.exports = function(app, db) {
 		    		//console.log("full message: "+ messageValues["message"]);
 		    	}
 		    }
-		    //console.log(messageValues);
-		    // put the rest of the code here
+		    ////////////////////////////////////////////////////////////////////
+		    //
+		    // Construct the phone array and use it to insert the data into the
+		    // phoneinfo collections
 			const phone = { 
 					smsc: messageValues["smsc"], 
 					sender: messageValues["sender"], 
@@ -143,7 +208,8 @@ module.exports = function(app, db) {
                     //res.send(result.ops[0]);
                     res.sendStatus(200);
 				}
-			});	    
+			});	 
+			////////////////////////////////////////////////////////////////////
 	    });		
 		//res.send("sms forwarded message received!");
 	});		
