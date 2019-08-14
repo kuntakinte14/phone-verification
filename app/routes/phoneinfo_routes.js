@@ -90,7 +90,10 @@ module.exports = function(app, db) {
                     //console.log(curPropsArray[0]+" - "+curPropsArray[1]);
                     messageValues["port"] = curPropsArray[0];
                     //messageValues["receiver"] = curPropsArray[1];
-                    if (typeof curPropsArray[1] != "undefined") {
+// this is the logic for testing with postman                    
+//if (typeof curPropsArray[1] != "undefined") {
+// this is the logic to use with ejoin
+if (curPropsArray[1] != "") {
                     	console.log("receiver value passed from ejoin!!!");
                     	messageValues["receiver"] = curPropsArray[1];
                     }
