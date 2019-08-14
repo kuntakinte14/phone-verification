@@ -4,16 +4,24 @@ var qs = require('querystring');
 var ObjectID = require('mongodb').ObjectID;
 
 const getDomain = require('./utils/findDomain');
+const getReceiver = require('./utils/assignReceiver');
 
 module.exports = function(app, db) {
 	const collection = 
 		
-	app.get('/test', (req, res) => {
+	app.get('/testFindDomain', (req, res) => {
 		var testString = "testing moving findDomain logic into a module";
 		var returnedValue = getDomain(testString);
-		res.send(returnedValue);
+		res.json(returnedValue);
 		console.log(returnedValue);
 	});
+	
+	app.get('/testAssignReceiver', (req, res) => {
+		var testString = "10.01";
+		var returnedValue = getReceiver(testString);
+		res.json(returnedValue);
+		console.log(returnedValue);
+	});	
 
     ////////////////////////////////////////////////////////////////////////////
 	//
@@ -21,6 +29,7 @@ module.exports = function(app, db) {
 	// sms gateway when an incoming message is received by that server
 	//
 	app.post('/ejoin', (req, res) => {
+		console.log("========================================================");
 		console.log("ejoin sms gateway sms message forwarded:");
 		//console.log(req.body);
 		var responseString="";
@@ -80,7 +89,15 @@ module.exports = function(app, db) {
                     curPropsArray = curValueArray[1].split(" ");
                     //console.log(curPropsArray[0]+" - "+curPropsArray[1]);
                     messageValues["port"] = curPropsArray[0];
-                    messageValues["receiver"] = curPropsArray[1];
+                    //messageValues["receiver"] = curPropsArray[1];
+                    if (typeof curPropsArray[1] != "undefined") {
+                    	console.log("receiver value passed from ejoin!!!");
+                    	messageValues["receiver"] = curPropsArray[1];
+                    }
+                    else {
+                    	console.log("receiver value set using lookup table with provided port !!!");
+                    	messageValues["receiver"] = getReceiver(curPropsArray[0].slice(1, -1)).toString();
+                    }
                     //senderArray = curValueArray;
                     //console.log(messageValues);                           
                 }
@@ -126,7 +143,7 @@ module.exports = function(app, db) {
 		    		// Try and Assign pid - move this code into a module to centralize
 		    		// all the logic for procesing the long list of domains we need to
 		    		// support
-		    		if (fullMessage.indexOf("AOL") != -1) {
+		    		/*if (fullMessage.indexOf("AOL") != -1) {
 		    			//console.log("is this aol? YES");
 		    			pid = "3";
 		    		}
@@ -138,7 +155,7 @@ module.exports = function(app, db) {
 		    		}
 		    		else if (fullMessage.indexOf("Office") != -1) {                                                                                                                                                      
                         pid = "4";
-		    		}	
+		    		}*/	
 		    		////////////////////////////////////////////////////////////
 		    		
 		    		////////////////////////////////////////////////////////////
@@ -205,6 +222,7 @@ module.exports = function(app, db) {
 			        res.send({ 'error': 'An error has occurred' }); 
 				} else {
                     console.log(result.ops[0]);
+            		console.log("========================================================");
                     //res.send(result.ops[0]);
                     res.sendStatus(200);
 				}
