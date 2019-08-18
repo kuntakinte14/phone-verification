@@ -46,7 +46,7 @@ module.exports = function(app, db) {
 	    	// the forwarded message.
 	    	//
 	    	////////////////////////////////////////////////////////////////////
-	        var messageArray = responseString.split("\r\n");
+	        //var messageArray = responseString.split("\r\n");
 	        ////////////////////////////////////////////////////////////////////
 	        //
 	        // this line is used for testing using postman which cannot be
@@ -57,7 +57,7 @@ module.exports = function(app, db) {
 	        // above line, and vice versa.
 	        //
 	        ////////////////////////////////////////////////////////////////////
-	    	//var messageArray = responseString.split("\n");
+	    	var messageArray = responseString.split("\n");
 	        
 	        var messageValues = [];
 		    for (i = 0; i < messageArray.length; i++) { 
@@ -90,16 +90,16 @@ module.exports = function(app, db) {
                     //console.log(curPropsArray[0]+" - "+curPropsArray[1]);
                     messageValues["port"] = curPropsArray[0];
                     //messageValues["receiver"] = curPropsArray[1];
-// this is the logic for testing with postman                    
-//if (typeof curPropsArray[1] != "undefined") {
-// this is the logic to use with ejoin
-if (curPropsArray[1] != "") {
+                    // this is the logic for testing with postman                    
+                    if (typeof curPropsArray[1] != "undefined") {
+                    // this is the logic to use with ejoin
+                    //if (curPropsArray[1] != "") {
                     	console.log("receiver value passed from ejoin!!!");
                     	messageValues["receiver"] = curPropsArray[1];
                     }
                     else {
                     	console.log("receiver value set using lookup table with provided port !!!");
-                    	messageValues["receiver"] = getReceiver(curPropsArray[0].slice(1, -1)).toString();
+                    	messageValues["receiver"] = getReceiver(curPropsArray[0].slice(1, -1));
                     }
                     //senderArray = curValueArray;
                     //console.log(messageValues);                           
