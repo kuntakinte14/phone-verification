@@ -17,7 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 module.exports = function(fullMessage) {
 	//default pid to 0
-	pid = 0;
+	pid = "0";
 	
 	if (fullMessage.indexOf("AOL") != -1) {
 		pid = "3";
